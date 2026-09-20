@@ -10,6 +10,13 @@ const RETRY_DELAYS_MS = [60_000, 120_000, 300_000, 900_000];
 /** البيانات تُعدّ قديمة بعد ثلاثة ايام بلا تحديث ناجح */
 const STALE_AFTER_MS = 3 * 24 * 60 * 60 * 1000;
 
+/**
+ * حد التنبيه على انحراف ساعة الجهاز.
+ * خمس دقائق تكفي لازاحة وقت الصلاة ازاحة ملحوظة، وهي اكبر بكثير
+ * من اي تأخير شبكة معقول فلا تسبب انذارات كاذبة.
+ */
+const CLOCK_SKEW_LIMIT_MS = 5 * 60_000;
+
 export interface PrayerTimesState {
   schedule: ScheduleState | null;
   today: DayTimings | null;
@@ -19,6 +26,10 @@ export interface PrayerTimesState {
   stale: boolean;
   lastFetchedAt: number | null;
   error: string | null;
+  /** ساعة الجهاز تخالف ساعة الخادم بفارق يفسد المواقيت */
+  clockWrong: boolean;
+  /** فرق ساعة الجهاز عن الخادم بالملي ثانية، موجب اذا كان متقدّما */
+  clockSkewMs: number | null;
 }
 
 /** يبني تاريخا من مفتاح اليوم YYYY-MM-DD عند منتصف النهار المحلي */
@@ -38,6 +49,7 @@ export function usePrayerTimes(now: Date, settings: Settings): PrayerTimesState 
   const [days, setDays] = useState<Record<string, DayTimings>>({});
   const [lastFetchedAt, setLastFetchedAt] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [clockSkewMs, setClockSkewMs] = useState<number | null>(null);
 
   const timerRef = useRef(0);
 
@@ -87,6 +99,7 @@ export function usePrayerTimes(now: Date, settings: Settings): PrayerTimesState 
 
         setDays((prev) => ({ ...prev, ...fresh.days }));
         setLastFetchedAt(fresh.fetchedAt);
+        setClockSkewMs(fresh.clockSkewMs);
         setError(null);
         attempt = 0;
 
@@ -135,5 +148,7 @@ export function usePrayerTimes(now: Date, settings: Settings): PrayerTimesState 
    */
   const stale = lastFetchedAt !== null && now.getTime() - lastFetchedAt > STALE_AFTER_MS;
 
-  return { schedule, today, empty, stale, lastFetchedAt, error };
+  const clockWrong = clockSkewMs !== null && Math.abs(clockSkewMs) > CLOCK_SKEW_LIMIT_MS;
+
+  return { schedule, today, empty, stale, lastFetchedAt, error, clockWrong, clockSkewMs };
 }

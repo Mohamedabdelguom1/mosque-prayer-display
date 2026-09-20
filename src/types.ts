@@ -119,4 +119,6 @@ export interface PrayerTimesLike {
   schedule: ScheduleState | null;
   today: DayTimings | null;
   stale: boolean;
+  clockWrong: boolean;
+  clockSkewMs: number | null;
 }

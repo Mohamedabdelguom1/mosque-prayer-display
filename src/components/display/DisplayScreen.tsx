@@ -14,6 +14,7 @@ import { AdhanOverlay } from '../overlays/AdhanOverlay';
 import { IqamaCountdown } from '../overlays/IqamaCountdown';
 import { SilenceNotice } from '../overlays/SilenceNotice';
 import { startBurnInProtection } from '../../lib/burnIn';
+import { formatClockSkew } from '../../lib/format';
 
 interface Props {
   now: Date;
@@ -23,7 +24,7 @@ interface Props {
 
 export function DisplayScreen({ now, data, phase }: Props) {
   const { settings } = useSettings();
-  const { schedule, today, stale } = data;
+  const { schedule, today, stale, clockWrong, clockSkewMs } = data;
 
   useEffect(() => {
     if (!settings.burnInProtection) return;
@@ -39,7 +40,14 @@ export function DisplayScreen({ now, data, phase }: Props) {
         seconds={settings.backgroundRotateSeconds}
       />
 
-      {stale && <div className="stale">تعذّر تحديث المواقيت — يُعرض آخر جدول محفوظ</div>}
+      {clockWrong ? (
+        <div className="stale stale--alarm">
+          ساعة الجهاز خاطئة بفارق {formatClockSkew(clockSkewMs)} — المواقيت المعروضة غير صحيحة.
+          اضبط وقت الجهاز أو فعّل NTP.
+        </div>
+      ) : (
+        stale && <div className="stale">تعذّر تحديث المواقيت — يُعرض آخر جدول محفوظ</div>
+      )}
 
       <div className="screen__content">
         {/* الترتيب هنا مقصود: في واجهة RTL يقع اول عنصر في اقصى اليمين.

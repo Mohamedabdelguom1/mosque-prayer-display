@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  formatClockSkew,
   formatCountdown,
   formatGregorian,
   formatTime,
@@ -52,6 +53,27 @@ describe('formatCountdown', () => {
   });
   it('يحترم الارقام الهندية', () => {
     expect(formatCountdown(125_000, true)).toBe('٠٢:٠٥');
+  });
+});
+
+describe('formatClockSkew', () => {
+  it('لا شيء حين لا يمكن القياس', () => {
+    expect(formatClockSkew(null)).toBe('');
+  });
+
+  it('يصف الدقائق ويحدّد الاتجاه', () => {
+    expect(formatClockSkew(7 * 60_000)).toBe('7 دقيقة (متقدّمة)');
+    expect(formatClockSkew(-7 * 60_000)).toBe('7 دقيقة (متأخّرة)');
+  });
+
+  it('يرتقي الى الساعات ثم الى الايام', () => {
+    expect(formatClockSkew(3 * 3_600_000)).toBe('3 ساعة (متقدّمة)');
+    expect(formatClockSkew(-2 * 86_400_000)).toBe('2 يوم (متأخّرة)');
+  });
+
+  it('الحالة الواقعية: جهاز بلا RTC يعود لسنوات مضت', () => {
+    const skew = new Date(2026, 8, 20).getTime() - new Date(1970, 0, 1).getTime();
+    expect(formatClockSkew(skew)).toContain('يوم (متقدّمة)');
   });
 });
 

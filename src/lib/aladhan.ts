@@ -24,6 +24,18 @@ export interface CachedMonth {
   days: Record<string, DayTimings>; // مفتاحه YYYY-MM-DD
 }
 
+export interface FetchedMonth extends CachedMonth {
+  /**
+   * فرق ساعة الجهاز عن ساعة الخادم بالملي ثانية، موجب اذا كان الجهاز متقدّما.
+   * null اذا لم يرسل الخادم ترويسة Date.
+   *
+   * هذا هو المرجع الوحيد المستقل عن الجهاز: كل مواقيت الشاشة مبنية على
+   * ساعته المحلية، وجهاز بلا وحدة RTC يفقد ساعته عند انقطاع الكهرباء
+   * فيعرض مواقيت خاطئة بثقة تامة ما لم نكشف الانحراف.
+   */
+  clockSkewMs: number | null;
+}
+
 function cacheKey(k: MonthKey): string {
   const mm = String(k.month).padStart(2, '0');
   return `mosque-display:prayers:${k.latitude.toFixed(4)}:${k.longitude.toFixed(
@@ -96,7 +108,7 @@ function writeCache(k: MonthKey, value: CachedMonth): void {
 }
 
 /** يجلب شهرا من الشبكة ويحفظه في الكاش */
-export async function fetchMonth(k: MonthKey, signal?: AbortSignal): Promise<CachedMonth> {
+export async function fetchMonth(k: MonthKey, signal?: AbortSignal): Promise<FetchedMonth> {
   const url =
     `${BASE}/${k.year}/${k.month}` +
     `?latitude=${k.latitude}&longitude=${k.longitude}` +
@@ -104,6 +116,12 @@ export async function fetchMonth(k: MonthKey, signal?: AbortSignal): Promise<Cac
 
   const res = await fetch(url, { signal });
   if (!res.ok) throw new Error(`Aladhan HTTP ${res.status}`);
+
+  // نقيس الانحراف فور وصول الرد، قبل اي معالجة قد تستغرق وقتا
+  const deviceNow = Date.now();
+  const serverDate = res.headers?.get?.('date');
+  const serverMs = serverDate ? Date.parse(serverDate) : NaN;
+  const clockSkewMs = Number.isFinite(serverMs) ? deviceNow - serverMs : null;
 
   const json = (await res.json()) as { code: number; data: AladhanDay[] };
   if (json.code !== 200 || !Array.isArray(json.data)) {
@@ -117,8 +135,8 @@ export async function fetchMonth(k: MonthKey, signal?: AbortSignal): Promise<Cac
   }
 
   const cached: CachedMonth = { fetchedAt: Date.now(), days };
-  writeCache(k, cached);
-  return cached;
+  writeCache(k, cached); // الانحراف لا يُخزَّن، فهو وصف للحظة لا للبيانات
+  return { ...cached, clockSkewMs };
 }
 
 /** ينظّف الاشهر القديمة حتى لا تتضخم مساحة التخزين */

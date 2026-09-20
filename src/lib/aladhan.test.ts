@@ -33,9 +33,10 @@ const rawDay = (gregorian: string, fajr: string) => ({
   },
 });
 
-const okResponse = (days: unknown[]) => ({
+const okResponse = (days: unknown[], dateHeader?: string) => ({
   ok: true,
   status: 200,
+  headers: { get: (h: string) => (h === 'date' && dateHeader ? dateHeader : null) },
   json: async () => ({ code: 200, data: days }),
 });
 
@@ -130,6 +131,53 @@ describe('fetchMonth', () => {
 
     const month = await fetchMonth(KEY);
     expect(month.days['2026-09-20']).toBeDefined(); // الذاكرة الحيّة تعمل
+  });
+});
+
+describe('قياس انحراف ساعة الجهاز', () => {
+  const day = () => rawDay('20-09-2026', '04:23');
+
+  it('يقيس الفارق من ترويسة Date التي يرسلها الخادم', async () => {
+    const serverTime = new Date('2026-09-20T12:00:00Z');
+    vi.setSystemTime(new Date(serverTime.getTime() + 3 * 86_400_000)); // الجهاز متقدّم ثلاثة ايام
+    vi.stubGlobal('fetch', vi.fn(async () => okResponse([day()], serverTime.toUTCString())));
+
+    const { clockSkewMs } = await fetchMonth(KEY);
+    expect(clockSkewMs).not.toBeNull();
+    expect(Math.round(clockSkewMs! / 86_400_000)).toBe(3);
+
+    vi.useRealTimers();
+  });
+
+  it('سالب حين تكون ساعة الجهاز متأخّرة', async () => {
+    const serverTime = new Date('2026-09-20T12:00:00Z');
+    vi.setSystemTime(new Date(serverTime.getTime() - 2 * 3_600_000));
+    vi.stubGlobal('fetch', vi.fn(async () => okResponse([day()], serverTime.toUTCString())));
+
+    const { clockSkewMs } = await fetchMonth(KEY);
+    expect(clockSkewMs!).toBeLessThan(0);
+
+    vi.useRealTimers();
+  });
+
+  it('null اذا لم يرسل الخادم ترويسة Date', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => okResponse([day()])));
+    expect((await fetchMonth(KEY)).clockSkewMs).toBeNull();
+  });
+
+  it('null ولا انهيار اذا لم يكن للرد ترويسات اصلا', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ code: 200, data: [day()] }),
+    })));
+    expect((await fetchMonth(KEY)).clockSkewMs).toBeNull();
+  });
+
+  it('لا يُخزَّن الانحراف في الكاش فهو وصف للحظة لا للبيانات', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => okResponse([day()], new Date().toUTCString())));
+    await fetchMonth(KEY);
+    expect(readCache(KEY)).not.toHaveProperty('clockSkewMs');
   });
 });
 

@@ -86,6 +86,24 @@ export function weekdayAr(date: Date): string {
   return WEEKDAYS_AR[date.getDay()];
 }
 
+/**
+ * يصف انحراف ساعة الجهاز عن الخادم بوحدة مفهومة للمشرف.
+ * موجب يعني ان ساعة الجهاز متقدّمة.
+ */
+export function formatClockSkew(ms: number | null): string {
+  if (ms === null) return '';
+  const abs = Math.abs(ms);
+  const dir = ms > 0 ? 'متقدّمة' : 'متأخّرة';
+
+  const days = Math.round(abs / 86_400_000);
+  if (days >= 1) return `${days} يوم (${dir})`;
+
+  const hours = Math.round(abs / 3_600_000);
+  if (hours >= 1) return `${hours} ساعة (${dir})`;
+
+  return `${Math.round(abs / 60_000)} دقيقة (${dir})`;
+}
+
 /** تاريخ محلي بصيغة YYYY-MM-DD بدون انزلاق المنطقة الزمنية */
 export function localDateKey(date: Date): string {
   const y = date.getFullYear();
