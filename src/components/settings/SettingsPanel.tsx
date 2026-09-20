@@ -7,8 +7,15 @@ import {
   PRAYER_ORDER,
 } from '../../config/defaults';
 import { useSettings } from '../../hooks/settingsContext';
-import { CheckField, Section, SelectField, TextField, TextareaField } from './fields';
-import { fieldKindOf, navIntent, stepIndex } from '../../lib/spatialNav';
+import {
+  CheckField,
+  RowButton,
+  Section,
+  SelectField,
+  TextField,
+  TextareaField,
+} from './fields';
+import { stepIndex } from '../../lib/spatialNav';
 
 const IQAMA_KEYS: AdhanPrayerKey[] = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
@@ -31,43 +38,24 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   }, []);
 
   /*
-   * التنقّل بالريموت: بلا هذا تبتلع حقول الكتابة الاسهم لتحريك مؤشرها
-   * فيعلق المشرف داخل الحقل ولا يخرج منه، وهي شكوى واقعية من الجهاز.
+   * التنقّل يجري بين الصفوف لا بين الحقول.
+   * الحقل لا يملك البؤرة اصلا الا بعد OK، ولولا ذلك لفتح التلفاز
+   * لوحة مفاتيحه فور وصول البؤرة اليه وابتلعت كل مفاتيح الاتجاه.
    */
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const el = e.target as HTMLElement;
-    const kind = fieldKindOf(el);
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
 
-    let atStart: boolean | undefined;
-    let atEnd: boolean | undefined;
-    if (kind === 'textarea') {
-      const ta = el as HTMLTextAreaElement;
-      atStart = ta.selectionStart === 0;
-      atEnd = ta.selectionEnd === ta.value.length;
-    }
-
-    const intent = navIntent(e.key, { kind, atStart, atEnd });
-    if (intent === 'native') return;
+    const row = (e.target as HTMLElement).closest<HTMLElement>('[data-editing]');
+    if (row?.dataset.editing === 'true') return; // الصف في وضع التحرير فالمفاتيح له
 
     e.preventDefault();
 
-    if (intent === 'increase' || intent === 'decrease') {
-      const input = el as HTMLInputElement;
-      if (intent === 'increase') input.stepUp();
-      else input.stepDown();
-      // stepUp لا يُطلق حدث input، فنُطلقه يدويا ليصل التغيير الى React
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      return;
-    }
+    const rows = Array.from(
+      rootRef.current?.querySelectorAll<HTMLElement>('[data-nav="row"]') ?? [],
+    ).filter((n) => n.offsetParent !== null);
 
-    const items = Array.from(
-      rootRef.current?.querySelectorAll<HTMLElement>(
-        'input:not([type="file"]), select, textarea, button',
-      ) ?? [],
-    ).filter((n) => !n.hasAttribute('disabled') && n.offsetParent !== null);
-
-    const current = items.indexOf(el);
-    const target = items[stepIndex(items.length, current, intent === 'next' ? 1 : -1)];
+    const current = rows.indexOf(row ?? (document.activeElement as HTMLElement));
+    const target = rows[stepIndex(rows.length, current, e.key === 'ArrowDown' ? 1 : -1)];
     if (target) {
       target.focus();
       target.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -127,7 +115,8 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   return (
     <div className="settings" ref={rootRef} onKeyDown={onKeyDown}>
       <div className="settings__remote-hint">
-        ▲▼ للتنقّل &nbsp;·&nbsp; ◀▶ لتغيير الأرقام &nbsp;·&nbsp; رجوع للخروج
+        ▲▼ للتنقّل &nbsp;·&nbsp; <b>OK للتعديل</b> &nbsp;·&nbsp; ◀▶ لتغيير الأرقام
+        &nbsp;·&nbsp; رجوع للخروج
       </div>
 
       <header className="settings__head">
@@ -138,26 +127,23 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           </div>
         </div>
         <div className="settings__actions">
-          <button className="btn btn--ghost" onClick={exportJson}>
-            تصدير JSON
-          </button>
-          <button className="btn btn--ghost" onClick={() => fileRef.current?.click()}>
-            استيراد JSON
-          </button>
-          <button
-            className="btn btn--danger"
-            onClick={() => {
+          <RowButton label="عودة للعرض" onPress={onClose} />
+          <RowButton label="تصدير JSON" variant="ghost" onPress={exportJson} />
+          <RowButton
+            label="استيراد JSON"
+            variant="ghost"
+            onPress={() => fileRef.current?.click()}
+          />
+          <RowButton
+            label="استعادة الافتراضي"
+            variant="danger"
+            onPress={() => {
               if (confirm('استعادة كل الإعدادات الافتراضية؟')) {
                 reset();
                 notify('تمت الاستعادة');
               }
             }}
-          >
-            استعادة الافتراضي
-          </button>
-          <button className="btn" onClick={onClose}>
-            عودة للعرض
-          </button>
+          />
         </div>
       </header>
 
@@ -184,13 +170,17 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           <div className="field">
             <label className="field__label">شعار مصوّر</label>
             <div className="settings__actions">
-              <button className="btn btn--ghost" onClick={() => logoRef.current?.click()}>
-                رفع صورة
-              </button>
+              <RowButton
+                label="رفع صورة"
+                variant="ghost"
+                onPress={() => logoRef.current?.click()}
+              />
               {settings.logoDataUrl && (
-                <button className="btn btn--ghost" onClick={() => update({ logoDataUrl: '' })}>
-                  إزالة
-                </button>
+                <RowButton
+                  label="إزالة الشعار"
+                  variant="ghost"
+                  onPress={() => update({ logoDataUrl: '' })}
+                />
               )}
             </div>
             <input
@@ -248,15 +238,13 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         >
           <div className="minute-grid">
             {PRAYER_ORDER.map((key) => (
-              <div key={key}>
-                <label className="field__label">{PRAYER_NAMES[key]}</label>
-                <input
-                  className="input"
-                  type="number"
-                  value={settings.offsets[key]}
-                  onChange={(e) => setOffset(key, e.target.value)}
-                />
-              </div>
+              <TextField
+                key={key}
+                label={PRAYER_NAMES[key]}
+                type="number"
+                value={settings.offsets[key]}
+                onChange={(v) => setOffset(key, v)}
+              />
             ))}
           </div>
         </Section>
@@ -264,15 +252,13 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         <Section title="فروقات الإقامة بالدقائق" desc="المدة بين الأذان والإقامة لكل صلاة.">
           <div className="minute-grid">
             {IQAMA_KEYS.map((key) => (
-              <div key={key}>
-                <label className="field__label">{PRAYER_NAMES[key]}</label>
-                <input
-                  className="input"
-                  type="number"
-                  value={settings.iqamaGaps[key]}
-                  onChange={(e) => setGap(key, e.target.value)}
-                />
-              </div>
+              <TextField
+                key={key}
+                label={PRAYER_NAMES[key]}
+                type="number"
+                value={settings.iqamaGaps[key]}
+                onChange={(v) => setGap(key, v)}
+              />
             ))}
           </div>
         </Section>

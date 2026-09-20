@@ -170,3 +170,59 @@
   animation: fade-in var(--t-fast) var(--ease);
   z-index: 40;
 }
+
+/* ===================== صفوف التنقّل بالريموت ===================== */
+/*
+ * البؤرة تقع على الصف لا على الحقل. هذا ما يمنع تلفاز اندرويد من فتح
+ * لوحة مفاتيحه فور وصول البؤرة، وهي التي كانت تبتلع مفاتيح الاتجاه.
+ */
+.frow {
+  display: block;
+  margin-bottom: 1.4rem;
+  padding: 0.8rem 1rem;
+  border-radius: 0.9rem;
+  border: 0.2rem solid transparent;
+  outline: none;
+  position: relative;
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+
+.frow:focus {
+  border-color: var(--c-gold-300);
+  background: rgba(212, 172, 99, 0.10);
+}
+
+/* في وضع التحرير نغيّر اللون ليعرف المشرف انه صار داخل الحقل */
+.frow--editing {
+  border-color: var(--c-green-400);
+  background: rgba(52, 168, 98, 0.12);
+}
+
+.frow__badge {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.25rem 1rem;
+  border-radius: 999rem;
+  background: var(--c-green-500);
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* الحقل غير المحرَّر يبدو ساكنا لا مُستدعيا للكتابة */
+.frow:not(.frow--editing) .input,
+.frow:not(.frow--editing) .textarea,
+.frow:not(.frow--editing) .select {
+  background: rgba(0, 0, 0, 0.22);
+  cursor: default;
+}
+
+.frow .field__label { display: block; margin-bottom: 0.5rem; }
+.frow .field__note { display: block; margin-top: 0.4rem; }
+.frow .check { margin-bottom: 0; }
+.frow .btn { width: 100%; }
+
+/* الارقام في شبكة الدقائق تبقى مضغوطة */
+.minute-grid .frow { margin-bottom: 0; padding: 0.6rem 0.5rem; }
+.minute-grid .frow .field__label { text-align: center; font-size: 1.35rem; }
+.minute-grid .input { text-align: center; padding: 0.8rem 0.4rem; }
