@@ -44,6 +44,9 @@ npm run check    # الأنواع ثم ESLint ثم الاختبارات
 | `phase.test.ts` | تسلسل الأذان والإقامة والصمت، وتصحيح الحالة بعد انقطاع |
 | `format.test.ts` | ص/م، منتصف الليل والظهيرة، الأرقام الهندية، مفتاح اليوم المحلي |
 | `qibla.test.ts` | اتجاه القبلة من أربع مدن، بقيم محسوبة باستقلال عن التنفيذ |
+| `aladhan.test.ts` | تحليل الرد، الكاش، أخطاء الشبكة، تنظيف الأشهر القديمة |
+| `storage.test.ts` | دمج الإعدادات، ترحيل النسخ القديمة، امتلاء حصة التخزين |
+| `burnIn.test.ts` | دورة الإزاحة وحدودها، وتنظيف المؤقّت عند الإيقاف |
 
 ## أول إعداد
 
@@ -57,10 +60,15 @@ npm run check    # الأنواع ثم ESLint ثم الاختبارات
 
 ### الصوت
 
-ضع `adhan.mp3` و `adhan-fajr.mp3` داخل `public/audio/`.
+`public/audio/adhan.mp3` موجود بالفعل (تسجيل بترخيص CC BY-SA 4.0، تفاصيله في
+`public/audio/README.txt`). استبدله بتسجيل مسجدك متى شئت.
+
+أذان الفجر يختلف بزيادة «الصلاة خير من النوم». ضع له ملفاً باسم `adhan-fajr.mp3`
+في المجلد نفسه؛ وإن لم يوجد **يرجع الفجر تلقائياً إلى `adhan.mp3`** بدل أن يدخل بلا صوت.
+وإن حُذف الملفان معاً تعمل الشاشة كاملة بلا صوت وبلا أي رسالة خطأ.
+
 المتصفحات تمنع التشغيل التلقائي قبل أول ضغطة؛ في وضع Kiosk نمرّر
 `--autoplay-policy=no-user-gesture-required` فيختفي القيد تماماً.
-إن لم يوجد ملف الصوت تعمل الشاشة كاملة بلا صوت وبلا أي رسالة خطأ.
 
 ### الخلفيات
 
@@ -75,13 +83,22 @@ npm run check    # الأنواع ثم ESLint ثم الاختبارات
 
 ## التركيب على جهاز HDMI
 
+خدمتان: واحدة تخدم الملفات وأخرى تفتح المتصفح.
+
 ```bash
-sudo cp scripts/mosque-display.service /etc/systemd/system/
+npm run build
+sudo cp scripts/mosque-display*.service /etc/systemd/system/
+sudo systemctl enable --now mosque-display-server
 sudo systemctl enable --now mosque-display
 ```
 
-سكربت `scripts/kiosk.sh` يعطّل إطفاء الشاشة، ويخفي المؤشر، ويشغّل Chromium بوضع Kiosk.
-عدّل `User` و `WorkingDirectory` في ملف الخدمة بما يناسب جهازك.
+- `scripts/serve.sh` يخدم مجلد `dist` على المنفذ 8080 بـ `python3 -m http.server`
+  (لا يحتاج أي حزمة إضافية على Raspberry Pi).
+- `scripts/kiosk.sh` ينتظر الخادم حتى يستجيب، ثم يعطّل إطفاء الشاشة،
+  ويخفي المؤشر، ويشغّل Chromium بوضع Kiosk.
+
+عدّل `User` و `WorkingDirectory` في ملفَي الخدمة بما يناسب جهازك.
+كلتاهما `Restart=always` فتعودان تلقائياً بعد أي تعطّل أو انقطاع كهرباء.
 
 > **ساعة الجهاز:** Raspberry Pi بلا وحدة RTC يفقد الوقت عند انقطاع الكهرباء،
 > وكل منطق الشاشة مبني على ساعة الجهاز. فعّل NTP، وإن كان الاتصال متقطعاً

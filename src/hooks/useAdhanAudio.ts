@@ -16,6 +16,10 @@ const AUDIO_SRC = {
   normal: './audio/adhan.mp3',
 };
 
+/** خطأ المتصفح حين يتعذّر تحميل مصدر الصوت اصلا */
+const isMissingSource = (err: unknown) =>
+  err instanceof DOMException && err.name === 'NotSupportedError';
+
 export interface AdhanAudio {
   /** هل يحتاج المستخدم للضغط لتفعيل الصوت */
   needsUnlock: boolean;
@@ -84,17 +88,30 @@ export function useAdhanAudio(settings: Settings): AdhanAudio {
       if (playedForRef.current === token) return;
       playedForRef.current = token;
 
-      el.src = slot.key === 'Fajr' ? AUDIO_SRC.fajr : AUDIO_SRC.normal;
       el.volume = settings.audioVolume;
-      el.currentTime = 0;
-      void el.play().catch((err: unknown) => {
-        // نفرّق بين منع التشغيل التلقائي وبين ملف صوت مفقود:
-        // الاول يُعالج بلافتة تفعيل، والثاني لا يستحق ازعاج المصلّين
-        // فالشاشة تؤدي عملها كاملا بلا صوت.
-        if (err instanceof DOMException && err.name === 'NotAllowedError') {
-          setNeedsUnlock(true);
-        }
-      });
+
+      const start = (src: string, fallback?: string) => {
+        el.src = src;
+        el.currentTime = 0;
+        void el.play().catch((err: unknown) => {
+          // اذان الفجر يختلف بزيادة "الصلاة خير من النوم".
+          // ان لم يضع المشرف ملفا خاصا به نرجع للاذان العام
+          // بدل ان يدخل الفجر بلا صوت.
+          if (fallback && isMissingSource(err)) {
+            start(fallback);
+            return;
+          }
+          // نفرّق بين منع التشغيل التلقائي وبين ملف صوت مفقود:
+          // الاول يُعالج بلافتة تفعيل، والثاني لا يستحق ازعاج المصلّين
+          // فالشاشة تؤدي عملها كاملا بلا صوت.
+          if (err instanceof DOMException && err.name === 'NotAllowedError') {
+            setNeedsUnlock(true);
+          }
+        });
+      };
+
+      if (slot.key === 'Fajr') start(AUDIO_SRC.fajr, AUDIO_SRC.normal);
+      else start(AUDIO_SRC.normal);
     },
     [settings.audioEnabled, settings.audioVolume],
   );

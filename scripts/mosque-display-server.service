@@ -1,0 +1,21 @@
+# خادم الملفات الساكنة الذي يقدّم مجلد dist.
+#
+#   sudo cp scripts/mosque-display-server.service /etc/systemd/system/
+#   sudo systemctl enable --now mosque-display-server
+#
+# عدّل User و WorkingDirectory بما يناسب جهازك.
+
+[Unit]
+Description=Mosque prayer times static file server
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/mosque-display
+ExecStart=/usr/bin/bash /home/pi/mosque-display/scripts/serve.sh 8080
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
