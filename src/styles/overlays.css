@@ -87,6 +87,7 @@
 .overlay--silence .overlay__prayer { font-size: 7.5rem; }
 
 /* لافتة تفعيل الصوت عند اول تشغيل */
+/* عنصر button حقيقي، فنُلغي هيئته الافتراضية ونبقي سلوكه */
 .unlock {
   position: absolute;
   z-index: 20;
@@ -98,6 +99,15 @@
   background: rgba(6, 18, 26, 0.92);
   cursor: pointer;
   text-align: center;
+  border: none;
+  font-family: inherit;
+  color: inherit;
+  width: 100%;
+  height: 100%;
+}
+.unlock:focus-visible {
+  outline: 0.3rem solid var(--c-gold-300);
+  outline-offset: -1.2rem;
 }
 .unlock__title { font-size: 4.4rem; font-weight: 800; color: var(--c-gold-100); }
 .unlock__msg { font-size: 2.1rem; color: var(--c-text-dim); max-width: 64rem; line-height: 1.7; }

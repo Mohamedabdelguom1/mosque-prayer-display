@@ -71,9 +71,27 @@
   border-radius: 0.8rem;
   outline: none;
 }
+/*
+ * حلقة تركيز عريضة وواضحة: التنقل في اللوحة يجري بمفاتيح الاتجاه
+ * من بعد ثلاثة امتار، فالحدّ الرفيع لا يُرى اصلا.
+ */
 .input:focus,
 .select:focus,
-.textarea:focus { border-color: var(--c-gold-500); }
+.textarea:focus,
+.btn:focus,
+.check input:focus {
+  outline: 0.25rem solid var(--c-gold-300);
+  outline-offset: 0.2rem;
+  border-color: var(--c-gold-300);
+}
+
+/* نُبرز الحقل المركَّز عليه اكثر بخلفية اهدأ */
+.input:focus,
+.select:focus,
+.textarea:focus { background: rgba(0, 0, 0, 0.55); }
+
+/* القسم الذي يقع التركيز داخله يُضاء طرفه ليعرف المشرف اين هو */
+.sec:focus-within { border-color: var(--c-gold-500); }
 .textarea { min-height: 12rem; line-height: 1.8; resize: vertical; }
 .select option { background: #0d1c26; }
 

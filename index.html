@@ -17,5 +17,19 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!--
+      عامل الخدمة يجعل الشاشة تُقلع بلا انترنت بعد اول زيارة ناجحة.
+      يُبنى فقط في نسخة الانتاج، ونتجاهل فشله في التطوير او عبر file://
+    -->
+    <script>
+      if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('./sw.js').catch(function () {
+            /* لا شيء: الشاشة تعمل كاملة بلا عامل خدمة */
+          });
+        });
+      }
+    </script>
   </body>
 </html>
