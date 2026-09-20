@@ -74,8 +74,11 @@ export const DEFAULT_MARQUEE: string[] = [
 ];
 
 /**
- * خلفيات اسلامية تتناوب. كلها صور بتراخيص حرة محفوظة محليا
- * في public/bg مع نسبها في CREDITS.json — تفاصيلها في BACKGROUNDS.md
+ * ما يُؤشَّر من مكتبة الخلفيات عند اول تشغيل.
+ *
+ * هذه الست وحدها تُخزَّن مسبقا مع التطبيق فتُقلع الشاشة بها بلا انترنت.
+ * وبقية المكتبة في public/bg/library تُجلب عند اول عرض لها.
+ * الفهرس كاملا مع نسبة كل صورة لصاحبها في public/bg/library.json
  */
 export const DEFAULT_BACKGROUNDS: string[] = [
   './bg/mosque-1.webp',

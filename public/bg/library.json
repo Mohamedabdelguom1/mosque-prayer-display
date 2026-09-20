@@ -1,0 +1,164 @@
+[
+  {
+    "file": "./bg/mosque-1.webp",
+    "nameAr": "المسجد النبوي — منظر الساحة",
+    "title": "Masjid Al Nabawi (17948287651).jpg",
+    "author": "SHAHID SIDDIQI from Karachi, Pakistan",
+    "license": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File%3AMasjid_Al_Nabawi_%2817948287651%29.jpg",
+    "default": true
+  },
+  {
+    "file": "./bg/mosque-2.webp",
+    "nameAr": "جامع السلطان قابوس — منظر جانبي",
+    "title": "Sultan Qaboos Grand Mosque (19889998133).jpg",
+    "author": "Riyadh Al Balushi",
+    "license": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3ASultan_Qaboos_Grand_Mosque_%2819889998133%29.jpg",
+    "default": true
+  },
+  {
+    "file": "./bg/mosque-3.webp",
+    "nameAr": "مسجد قول شريف — قازان",
+    "title": "Kazan Kul Sharif Mosque 2024-07-13 1341.jpg",
+    "author": "Mike1979 Russia",
+    "license": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3AKazan_Kul_Sharif_Mosque_2024-07-13_1341.jpg",
+    "default": true
+  },
+  {
+    "file": "./bg/mosque-4.webp",
+    "nameAr": "جامع السلطان أحمد — إسطنبول",
+    "title": "Exterior of Sultan Ahmed I Mosque in Istanbul, Turkey 002.jpg",
+    "author": "Moonik",
+    "license": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3AExterior_of_Sultan_Ahmed_I_Mosque_in_Istanbul%2C_Turkey_002.jpg",
+    "default": true
+  },
+  {
+    "file": "./bg/mosque-5.webp",
+    "nameAr": "مسجد بوترا — بوتراجايا",
+    "title": "Putrajaya Malaysia Putra-Mosque-06.jpg",
+    "author": "CEphoto, Uwe Aranas",
+    "license": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3APutrajaya_Malaysia_Putra-Mosque-06.jpg",
+    "default": true
+  },
+  {
+    "file": "./bg/mosque-6.webp",
+    "nameAr": "مسجد بادشاهي — لاهور",
+    "title": "Badshahi Mosque, Lahore I.jpg",
+    "author": "Fassifarooq",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3ABadshahi_Mosque%2C_Lahore_I.jpg",
+    "default": true
+  },
+  {
+    "file": "./bg/library/nabawi.webp",
+    "nameAr": "المسجد النبوي — المدينة المنورة",
+    "title": "Al-Masjid An-Nabawi (Bird's Eye View).jpg",
+    "author": "Konevi",
+    "license": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File%3AAl-Masjid_An-Nabawi_%28Bird%27s_Eye_View%29.jpg",
+    "default": false
+  },
+  {
+    "file": "./bg/library/haram.webp",
+    "nameAr": "المسجد الحرام — مكة المكرمة",
+    "title": "Masjid al-Haram 2022.jpg",
+    "author": "مريم محمد الغلبان",
+    "license": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File%3AMasjid_al-Haram_2022.jpg",
+    "default": false
+  },
+  {
+    "file": "./bg/library/sultan-ahmed.webp",
+    "nameAr": "جامع السلطان أحمد — إسطنبول",
+    "title": "Sultan Ahmed Mosque 2022 2.jpg",
+    "author": "kallerna",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3ASultan_Ahmed_Mosque_2022_2.jpg",
+    "default": false
+  },
+  {
+    "file": "./bg/library/hassan-ii.webp",
+    "nameAr": "مسجد الحسن الثاني — الدار البيضاء",
+    "title": "Minaret de Casablanca -2-.jpg",
+    "author": "Farid mernissi",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3AMinaret_de_Casablanca_-2-.jpg",
+    "default": false
+  },
+  {
+    "file": "./bg/library/faisal.webp",
+    "nameAr": "مسجد الملك فيصل — إسلام آباد",
+    "title": "Faisal Mosque - fountain area.jpg",
+    "author": "Shahzaib Damn Cruze",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3AFaisal_Mosque_-_fountain_area.jpg",
+    "default": false
+  },
+  {
+    "file": "./bg/library/kul-sharif.webp",
+    "nameAr": "مسجد قول شريف — قازان",
+    "title": "Kul Sharif Mosque, Kazan (46957847842).jpg",
+    "author": "kuhnmi",
+    "license": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3AKul_Sharif_Mosque%2C_Kazan_%2846957847842%29.jpg",
+    "default": false
+  },
+  {
+    "file": "./bg/library/qaboos.webp",
+    "nameAr": "جامع السلطان قابوس — مسقط",
+    "title": "Muscat, moschea del sultano qaboos, esterno 01.jpg",
+    "author": "Francesco Bini",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3AMuscat%2C_moschea_del_sultano_qaboos%2C_esterno_01.jpg",
+    "default": false
+  },
+  {
+    "file": "./bg/library/kairouan.webp",
+    "nameAr": "جامع عقبة بن نافع — القيروان",
+    "title": "Courtyard of the Great Mosque Okba of Kairouan.jpg",
+    "author": "Monaam Ben Fredj",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3ACourtyard_of_the_Great_Mosque_Okba_of_Kairouan.jpg",
+    "default": false
+  },
+  {
+    "file": "./bg/library/isfahan.webp",
+    "nameAr": "مسجد الإمام — أصفهان",
+    "title": "Shah Mosque (Isfahan).jpg",
+    "author": "Amir Pashaei",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3AShah_Mosque_%28Isfahan%29.jpg",
+    "default": false
+  },
+  {
+    "file": "./bg/library/suleymaniye.webp",
+    "nameAr": "جامع السليمانية — إسطنبول",
+    "title": "Courtyard of the Süleymaniye Mosque in Istanbul, Turkey 004.jpg",
+    "author": "Moonik",
+    "license": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3ACourtyard_of_the_S%C3%BCleymaniye_Mosque_in_Istanbul%2C_Turkey_004.jpg",
+    "default": false
+  },
+  {
+    "file": "./bg/library/sheikh-lotfollah.webp",
+    "nameAr": "مسجد الشيخ لطف الله — أصفهان",
+    "title": "Sheikh Lotfollah Mosque, Isfahan 01.jpg",
+    "author": "Bernard Gagnon",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3ASheikh_Lotfollah_Mosque%2C_Isfahan_01.jpg",
+    "default": false
+  },
+  {
+    "file": "./bg/library/sultan-salahuddin.webp",
+    "nameAr": "مسجد السلطان صلاح الدين — شاه عالم",
+    "title": "SA-masjid-sultan-salahuddin-tasik.jpg",
+    "author": "Algazel",
+    "license": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File%3ASA-masjid-sultan-salahuddin-tasik.jpg",
+    "default": false
+  }
+]

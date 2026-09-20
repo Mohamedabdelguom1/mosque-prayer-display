@@ -16,6 +16,7 @@ import {
   TextareaField,
 } from './fields';
 import { stepIndex } from '../../lib/spatialNav';
+import { useBackgroundLibrary } from '../../hooks/useBackgroundLibrary';
 
 const IQAMA_KEYS: AdhanPrayerKey[] = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
@@ -27,6 +28,7 @@ const num = (v: string, fallback: number) => {
 export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const { settings, update, replace, reset } = useSettings();
   const [flash, setFlash] = useState('');
+  const library = useBackgroundLibrary();
   const fileRef = useRef<HTMLInputElement>(null);
   const logoRef = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -310,9 +312,34 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           />
         </Section>
 
+        <Section title="مكتبة الخلفيات">
+          <p className="sec__desc">
+            اختر ما يتناوب على الشاشة. المختار الآن {settings.backgrounds.length} من{' '}
+            {library.length}.
+          </p>
+          {library.length === 0 && (
+            <p className="sec__desc">تعذّر قراءة فهرس المكتبة. حرّر المسارات يدويا أدناه.</p>
+          )}
+          {library.map((item) => (
+            <CheckField
+              key={item.file}
+              label={item.nameAr}
+              checked={settings.backgrounds.includes(item.file)}
+              onChange={(on) =>
+                update({
+                  backgrounds: on
+                    ? [...settings.backgrounds, item.file]
+                    : settings.backgrounds.filter((f) => f !== item.file),
+                })
+              }
+            />
+          ))}
+          <p className="sec__desc">صورة واحدة تعني مشهدا ثابتا بلا تناوب.</p>
+        </Section>
+
         <Section title="المظهر">
           <TextareaField
-            label="الخلفيات المتناوبة"
+            label="خلفيات إضافية من عندك"
             value={settings.backgrounds.join('\n')}
             onChange={(v) =>
               update({
@@ -322,7 +349,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                   .filter(Boolean),
               })
             }
-            note="مسار في كل سطر. ضع صورك في public/bg ثم اكتب ./bg/name.webp — خلفية واحدة تعني ثبات المشهد."
+            note="القائمة الكاملة، مسار في كل سطر. ضع صورك في public/bg ثم اكتب ./bg/name.webp."
           />
           <TextField
             label="مدة بقاء كل خلفية بالثواني"

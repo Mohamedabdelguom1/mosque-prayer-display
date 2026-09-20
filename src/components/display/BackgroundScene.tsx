@@ -47,25 +47,34 @@ export function BackgroundScene({ images, seconds }: Props) {
 
     let index = 0;
 
+    /*
+     * ننتقل الى الصورة التالية، ونتخطّى ما تعذّر تحميله.
+     *
+     * صور المكتبة لا تُخزَّن مسبقا، فقد لا تكون متاحة عند اول دورة
+     * بلا انترنت. ولو بدّلنا الطبقة الى صورة فاشلة لظهرت الشاشة سوداء
+     * حتى الدورة التالية. لذلك نجرّب ما بعدها، وننسحب بهدوء مُبقين
+     * الصورة الحالية ان تعذّرت كلها.
+     */
+    const advance = (remaining: number) => {
+      if (remaining <= 0) return;
+
+      index = (index + 1) % sources.length;
+      const src = sources[index];
+
+      const preload = new Image();
+      preload.onload = () =>
+        setState((prev) => {
+          const target: 0 | 1 = prev.active === 0 ? 1 : 0;
+          const slots: [string, string] = [prev.slots[0], prev.slots[1]];
+          slots[target] = src;
+          return { slots, active: target };
+        });
+      preload.onerror = () => advance(remaining - 1);
+      preload.src = src;
+    };
+
     const timer = window.setInterval(
-      () => {
-        index = (index + 1) % sources.length;
-        const src = sources[index];
-
-        const swap = () =>
-          setState((prev) => {
-            const target: 0 | 1 = prev.active === 0 ? 1 : 0;
-            const slots: [string, string] = [prev.slots[0], prev.slots[1]];
-            slots[target] = src;
-            return { slots, active: target };
-          });
-
-        // لا نبدأ التلاشي الا بعد اكتمال تحميل الصورة، والا ظهر اطار فارغ
-        const preload = new Image();
-        preload.onload = swap;
-        preload.onerror = swap; // صورة مفقودة لا توقف الدورة
-        preload.src = src;
-      },
+      () => advance(sources.length),
       Math.max(15, seconds) * 1000,
     );
 
