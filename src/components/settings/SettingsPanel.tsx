@@ -6,7 +6,7 @@ import {
   PRAYER_NAMES,
   PRAYER_ORDER,
 } from '../../config/defaults';
-import { useSettings } from '../../hooks/useSettings';
+import { useSettings } from '../../hooks/settingsContext';
 import { CheckField, Section, SelectField, TextField, TextareaField } from './fields';
 
 const IQAMA_KEYS: AdhanPrayerKey[] = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];

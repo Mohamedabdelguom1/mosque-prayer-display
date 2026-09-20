@@ -1,79 +1,86 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
   images: string[];
   seconds: number;
 }
 
-const FALLBACK = './bg/mosque.svg';
+const FALLBACK = ['./bg/mosque.svg'];
+
+interface BgState {
+  /** مصدر الصورة لكل طبقة من الطبقتين الثابتتين */
+  slots: [string, string];
+  /** ايّ الطبقتين ظاهرة الآن */
+  active: 0 | 1;
+}
+
+const initialState = (first: string): BgState => ({ slots: [first, ''], active: 0 });
 
 /**
  * خلفيات تتناوب بتلاش متبادل، مع حركة Ken Burns بطيئة جدا.
  *
  * الطبقتان ثابتتان في الشجرة ولا تحملان key متغيّرا:
- * لو أعاد React انشاءهما في كل دورة لظهر عنصر جديد بشفافية نهائية مباشرة
+ * لو أعاد React انشاءهما في كل دورة لظهر عنصر جديد بشفافيته النهائية مباشرة
  * فلا ينفّذ المتصفح انتقال الشفافية اصلا، وتقفز الصورة بدل ان تتلاشى.
  *
  * ولا نرسم الا طبقتين مهما بلغ عدد الصور، لان كل صورة 1920x1080
  * مفكوكة الضغط تكلّف نحو 8 ميغابايت من ذاكرة جهاز العرض.
  */
 export function BackgroundScene({ images, seconds }: Props) {
-  const list = useMemo(
-    () => (images.length > 0 ? images : [FALLBACK]),
-    // المقارنة بالمحتوى لا بهوية المصفوفة، حتى لا تُعاد الدورة مع كل رسم
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [images.join('|')],
-  );
+  const list = images.length > 0 ? images : FALLBACK;
+  const key = list.join('|');
 
-  const [slots, setSlots] = useState<[string, string]>([list[0], '']);
-  const [active, setActive] = useState<0 | 1>(0);
+  const [state, setState] = useState<BgState>(() => initialState(list[0]));
 
-  const activeRef = useRef<0 | 1>(0);
-  activeRef.current = active;
-
-  // اذا تغيّرت القائمة من الاعدادات نعيد البدء من اول صورة
-  useEffect(() => {
-    setSlots([list[0], '']);
-    setActive(0);
-  }, [list]);
+  // تبدّلت قائمة الخلفيات من الاعدادات: نعيد البدء من اول صورة.
+  // الضبط اثناء الرسم هو النمط الذي يوصي به React لمزامنة الحالة مع تغيّر الخصائص،
+  // وهو افضل من setState داخل useEffect لانه لا يسبب رسمة وسيطة بحالة قديمة.
+  const [prevKey, setPrevKey] = useState(key);
+  if (prevKey !== key) {
+    setPrevKey(key);
+    setState(initialState(list[0]));
+  }
 
   useEffect(() => {
-    if (list.length <= 1) return;
+    const sources = key.split('|');
+    if (sources.length <= 1) return;
 
     let index = 0;
 
-    const advance = () => {
-      index = (index + 1) % list.length;
-      const src = list[index];
+    const timer = window.setInterval(
+      () => {
+        index = (index + 1) % sources.length;
+        const src = sources[index];
 
-      // لا نبدأ التلاشي الا بعد اكتمال تحميل الصورة، والا ظهر اطار فارغ
-      const swap = () => {
-        const target = activeRef.current === 0 ? 1 : 0;
-        setSlots((prev) => {
-          const next: [string, string] = [prev[0], prev[1]];
-          next[target] = src;
-          return next;
-        });
-        setActive(target);
-      };
+        const swap = () =>
+          setState((prev) => {
+            const target: 0 | 1 = prev.active === 0 ? 1 : 0;
+            const slots: [string, string] = [prev.slots[0], prev.slots[1]];
+            slots[target] = src;
+            return { slots, active: target };
+          });
 
-      const preload = new Image();
-      preload.onload = swap;
-      preload.onerror = swap; // صورة مفقودة لا توقف الدورة
-      preload.src = src;
-    };
+        // لا نبدأ التلاشي الا بعد اكتمال تحميل الصورة، والا ظهر اطار فارغ
+        const preload = new Image();
+        preload.onload = swap;
+        preload.onerror = swap; // صورة مفقودة لا توقف الدورة
+        preload.src = src;
+      },
+      Math.max(15, seconds) * 1000,
+    );
 
-    const timer = window.setInterval(advance, Math.max(15, seconds) * 1000);
     return () => window.clearInterval(timer);
-  }, [list, seconds]);
+  }, [key, seconds]);
 
   return (
     <div className="bg">
-      {[0, 1].map((slot) => (
+      {([0, 1] as const).map((slot) => (
         <div
           key={slot}
-          className={`bg__layer${active === slot ? ' bg__layer--on' : ''}`}
-          style={slots[slot] ? { backgroundImage: `url("${slots[slot]}")` } : undefined}
+          className={`bg__layer${state.active === slot ? ' bg__layer--on' : ''}`}
+          style={
+            state.slots[slot] ? { backgroundImage: `url("${state.slots[slot]}")` } : undefined
+          }
         />
       ))}
       <div className="bg__scrim" />

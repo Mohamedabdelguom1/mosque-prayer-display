@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useClock } from './hooks/useClock';
-import { useSettings } from './hooks/useSettings';
+import { useSettings } from './hooks/settingsContext';
 import { usePrayerTimes } from './hooks/usePrayerTimes';
 import { usePhase } from './hooks/usePhase';
 import { useAdhanAudio } from './hooks/useAdhanAudio';

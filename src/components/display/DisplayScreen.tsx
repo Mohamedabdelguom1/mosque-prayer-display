@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import type { PhaseState, PrayerTimesLike } from '../../types';
-import { useSettings } from '../../hooks/useSettings';
+import { useSettings } from '../../hooks/settingsContext';
 import { BackgroundScene } from './BackgroundScene';
 import { MosqueIdentity } from './MosqueIdentity';
 import { AyahRotator } from './AyahRotator';
