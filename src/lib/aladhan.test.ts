@@ -33,10 +33,16 @@ const rawDay = (gregorian: string, fajr: string) => ({
   },
 });
 
-const okResponse = (days: unknown[], dateHeader?: string) => ({
+const okResponse = (days: unknown[], dateHeader?: string, ageHeader?: string) => ({
   ok: true,
   status: 200,
-  headers: { get: (h: string) => (h === 'date' && dateHeader ? dateHeader : null) },
+  headers: {
+    get: (h: string) => {
+      if (h === 'date') return dateHeader ?? null;
+      if (h === 'age') return ageHeader ?? null;
+      return null;
+    },
+  },
   json: async () => ({ code: 200, data: days }),
 });
 
@@ -158,6 +164,25 @@ describe('قياس انحراف ساعة الجهاز', () => {
     expect(clockSkewMs!).toBeLessThan(0);
 
     vi.useRealTimers();
+  });
+
+  it('يطلب بلا كاش، فالخادم يرسل max-age=3600 ولو خُزّن الرد لقِسنا عمره لا ساعتنا', async () => {
+    const spy = vi.fn(async (_url: string, _init?: RequestInit) =>
+      okResponse([day()], new Date().toUTCString()),
+    );
+    vi.stubGlobal('fetch', spy);
+
+    await fetchMonth(KEY);
+    expect(spy.mock.calls[0][1]?.cache).toBe('no-store');
+  });
+
+  it('لا ينبّه على رد جاء من وسيط: ترويسة Age تعني نسخة مخزّنة', async () => {
+    // هذا ما اوقع الانذار الكاذب "ساعة الجهاز خاطئة بفارق 21 دقيقة":
+    // تاريخ الرد كان عمره 21 دقيقة لانه محفوظ، والساعة سليمة تماما
+    const stale = new Date(Date.now() - 21 * 60_000).toUTCString();
+    vi.stubGlobal('fetch', vi.fn(async () => okResponse([day()], stale, '1260')));
+
+    expect((await fetchMonth(KEY)).clockSkewMs).toBeNull();
   });
 
   it('null اذا لم يرسل الخادم ترويسة Date', async () => {

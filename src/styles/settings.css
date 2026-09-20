@@ -28,11 +28,30 @@
 .settings__hint { font-size: 1.5rem; color: var(--c-text-faint); margin-top: 0.4rem; }
 .settings__actions { display: flex; gap: 1rem; flex-wrap: wrap; }
 
+/*
+ * عمود واحد مقصود: التنقّل بالريموت يمضي بترتيب العناصر في الصفحة،
+ * ولو وُزّعت على اعمدة لقفزت البؤرة يمنة ويسرة بلا منطق مرئي.
+ */
 .settings__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(44rem, 1fr));
+  grid-template-columns: 1fr;
   gap: 2.4rem;
-  align-items: start;
+  max-width: 96rem;
+  margin: 0 auto;
+}
+
+.settings__remote-hint {
+  position: sticky;
+  top: -4rem;
+  z-index: 3;
+  margin-bottom: 1.2rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: 0.8rem;
+  background: rgba(212, 172, 99, 0.14);
+  border: 0.1rem solid var(--c-panel-edge);
+  color: var(--c-gold-100);
+  font-size: 1.5rem;
+  text-align: center;
 }
 
 .sec {

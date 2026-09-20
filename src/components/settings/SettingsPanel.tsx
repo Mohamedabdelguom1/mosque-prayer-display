@@ -8,6 +8,7 @@ import {
 } from '../../config/defaults';
 import { useSettings } from '../../hooks/settingsContext';
 import { CheckField, Section, SelectField, TextField, TextareaField } from './fields';
+import { fieldKindOf, navIntent, stepIndex } from '../../lib/spatialNav';
 
 const IQAMA_KEYS: AdhanPrayerKey[] = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
@@ -21,12 +22,57 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const [flash, setFlash] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const logoRef = useRef<HTMLInputElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   // المؤشر مخفي على شاشة العرض — نعيده داخل اللوحة
   useEffect(() => {
     document.body.classList.add('has-cursor');
     return () => document.body.classList.remove('has-cursor');
   }, []);
+
+  /*
+   * التنقّل بالريموت: بلا هذا تبتلع حقول الكتابة الاسهم لتحريك مؤشرها
+   * فيعلق المشرف داخل الحقل ولا يخرج منه، وهي شكوى واقعية من الجهاز.
+   */
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const el = e.target as HTMLElement;
+    const kind = fieldKindOf(el);
+
+    let atStart: boolean | undefined;
+    let atEnd: boolean | undefined;
+    if (kind === 'textarea') {
+      const ta = el as HTMLTextAreaElement;
+      atStart = ta.selectionStart === 0;
+      atEnd = ta.selectionEnd === ta.value.length;
+    }
+
+    const intent = navIntent(e.key, { kind, atStart, atEnd });
+    if (intent === 'native') return;
+
+    e.preventDefault();
+
+    if (intent === 'increase' || intent === 'decrease') {
+      const input = el as HTMLInputElement;
+      if (intent === 'increase') input.stepUp();
+      else input.stepDown();
+      // stepUp لا يُطلق حدث input، فنُطلقه يدويا ليصل التغيير الى React
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      return;
+    }
+
+    const items = Array.from(
+      rootRef.current?.querySelectorAll<HTMLElement>(
+        'input:not([type="file"]), select, textarea, button',
+      ) ?? [],
+    ).filter((n) => !n.hasAttribute('disabled') && n.offsetParent !== null);
+
+    const current = items.indexOf(el);
+    const target = items[stepIndex(items.length, current, intent === 'next' ? 1 : -1)];
+    if (target) {
+      target.focus();
+      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  };
 
   const notify = (msg: string) => {
     setFlash(msg);
@@ -79,7 +125,11 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="settings">
+    <div className="settings" ref={rootRef} onKeyDown={onKeyDown}>
+      <div className="settings__remote-hint">
+        ▲▼ للتنقّل &nbsp;·&nbsp; ◀▶ لتغيير الأرقام &nbsp;·&nbsp; رجوع للخروج
+      </div>
+
       <header className="settings__head">
         <div>
           <div className="settings__title">إعدادات شاشة المسجد</div>

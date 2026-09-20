@@ -43,6 +43,27 @@ function cacheKey(k: MonthKey): string {
   )}:${k.method}:${k.school}:${k.year}-${mm}`;
 }
 
+/**
+ * يقيس فرق ساعة الجهاز عن الخادم من ترويسة Date.
+ *
+ * يرجع null اذا كان الرد قد يكون محفوظا في وسيط: ترويسة Age تعني
+ * ان نسخة مخزّنة قُدّمت، وتاريخها لحظة توليدها لا لحظة وصولها،
+ * فقياسها يعطي انحرافا وهميا بقدر عمر النسخة.
+ */
+function measureSkew(res: Response, deviceNow: number): number | null {
+  const headers = res.headers;
+  if (!headers?.get) return null;
+
+  const age = Number(headers.get('age'));
+  if (Number.isFinite(age) && age > 0) return null;
+
+  const serverDate = headers.get('date');
+  if (!serverDate) return null;
+
+  const serverMs = Date.parse(serverDate);
+  return Number.isFinite(serverMs) ? deviceNow - serverMs : null;
+}
+
 /** يحوّل "05:08 (+03)" الى 308 دقيقة */
 function parseMinutes(raw: string): number {
   const m = /^(\d{1,2}):(\d{2})/.exec(raw.trim());
@@ -114,14 +135,18 @@ export async function fetchMonth(k: MonthKey, signal?: AbortSignal): Promise<Fet
     `?latitude=${k.latitude}&longitude=${k.longitude}` +
     `&method=${k.method}&school=${k.school}`;
 
-  const res = await fetch(url, { signal });
+  /*
+   * no-store مقصود: الخادم يرسل Cache-Control: max-age=3600، فلولا ذلك
+   * لأعاد المتصفح ردا محفوظا بترويسة Date قديمة، فنقيس عمر الكاش
+   * ونحسبه انحرافا في ساعة الجهاز وننبّه بلا سبب.
+   * ولا نخسر شيئا بتعطيله، فلدينا كاشنا الخاص في localStorage.
+   */
+  const res = await fetch(url, { signal, cache: 'no-store' });
   if (!res.ok) throw new Error(`Aladhan HTTP ${res.status}`);
 
   // نقيس الانحراف فور وصول الرد، قبل اي معالجة قد تستغرق وقتا
   const deviceNow = Date.now();
-  const serverDate = res.headers?.get?.('date');
-  const serverMs = serverDate ? Date.parse(serverDate) : NaN;
-  const clockSkewMs = Number.isFinite(serverMs) ? deviceNow - serverMs : null;
+  const clockSkewMs = measureSkew(res, deviceNow);
 
   const json = (await res.json()) as { code: number; data: AladhanDay[] };
   if (json.code !== 200 || !Array.isArray(json.data)) {
