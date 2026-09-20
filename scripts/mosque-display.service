@@ -1,0 +1,22 @@
+# خدمة systemd لتشغيل الشاشة تلقائيا عند الاقلاع واعادتها عند اي تعطل.
+#
+#   sudo cp scripts/mosque-display.service /etc/systemd/system/
+#   sudo systemctl enable --now mosque-display
+#
+# عدّل User و WorkingDirectory بما يناسب جهازك.
+
+[Unit]
+Description=Mosque prayer times display
+After=graphical.target network-online.target
+
+[Service]
+Type=simple
+User=pi
+Environment=DISPLAY=:0
+WorkingDirectory=/home/pi/mosque-display
+ExecStart=/usr/bin/bash /home/pi/mosque-display/scripts/kiosk.sh http://localhost:8080
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=graphical.target

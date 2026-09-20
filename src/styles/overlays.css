@@ -1,0 +1,103 @@
+/* ===================== الطبقات: الاذان والاقامة والصمت ===================== */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--gap-md);
+  text-align: center;
+  background: rgba(6, 18, 26, 0.86);
+  backdrop-filter: blur(1.2rem);
+  animation: overlay-in var(--t-mid) var(--ease) both;
+}
+
+.overlay__halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 52rem;
+  height: 52rem;
+  border-radius: 50%;
+  border: 0.2rem solid var(--c-gold-300);
+  animation: halo 4s ease-out infinite;
+  pointer-events: none;
+}
+.overlay__halo:nth-of-type(2) { animation-delay: 1.3s; }
+.overlay__halo:nth-of-type(3) { animation-delay: 2.6s; }
+
+.overlay__kicker {
+  font-size: 2.6rem;
+  color: var(--c-gold-300);
+  letter-spacing: 0.08em;
+  position: relative;
+}
+.overlay__prayer {
+  font-size: 11rem;
+  font-weight: 900;
+  color: var(--c-gold-100);
+  line-height: 1;
+  text-shadow: 0 0.4rem 3rem rgba(0, 0, 0, 0.7);
+  position: relative;
+}
+.overlay__sub {
+  font-size: 3.4rem;
+  font-weight: 600;
+  color: var(--c-text);
+  position: relative;
+}
+.overlay__note {
+  font-size: 2.2rem;
+  color: var(--c-text-dim);
+  max-width: 80rem;
+  line-height: 1.7;
+  position: relative;
+}
+
+.overlay__countdown {
+  font-size: 16rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  direction: ltr;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0.5rem 3.5rem rgba(52, 168, 98, 0.6);
+  position: relative;
+}
+
+.overlay__bar {
+  position: relative;
+  width: 64rem;
+  height: 0.7rem;
+  border-radius: 999rem;
+  background: rgba(255, 255, 255, 0.16);
+  overflow: hidden;
+}
+.overlay__bar-fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: right center;
+  transform: scaleX(var(--progress, 0));
+  background: linear-gradient(to left, var(--c-green-400), var(--c-gold-300));
+  transition: transform 1s linear;
+}
+
+.overlay--silence { background: rgba(4, 14, 20, 0.94); }
+.overlay--silence .overlay__prayer { font-size: 7.5rem; }
+
+/* لافتة تفعيل الصوت عند اول تشغيل */
+.unlock {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--gap-sm);
+  background: rgba(6, 18, 26, 0.92);
+  cursor: pointer;
+  text-align: center;
+}
+.unlock__title { font-size: 4.4rem; font-weight: 800; color: var(--c-gold-100); }
+.unlock__msg { font-size: 2.1rem; color: var(--c-text-dim); max-width: 64rem; line-height: 1.7; }

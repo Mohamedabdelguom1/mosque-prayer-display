@@ -1,0 +1,98 @@
+/*
+ * كل الحركات في مكان واحد.
+ * قاعدة صارمة: transform و opacity و filter فقط —
+ * أي حركة على width/top/left ستُسبب تقطيعاً على جهاز العرض الصغير.
+ */
+
+/* دخول البطاقات بالتتابع */
+@keyframes rise-in {
+  from { opacity: 0; transform: translate3d(0, 2.4rem, 0) scale(0.96); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fade-slide-down {
+  from { opacity: 0; transform: translate3d(0, -1.4rem, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* نبض التوهّج على بطاقة الصلاة القادمة */
+@keyframes active-pulse {
+  0%, 100% {
+    transform: translate3d(0, -0.5rem, 0) scale(1.03);
+    box-shadow: 0 0 0 0.18rem rgba(246, 230, 191, 0.55),
+                0 1rem 2.4rem rgba(52, 168, 98, 0.35);
+  }
+  50% {
+    transform: translate3d(0, -0.7rem, 0) scale(1.045);
+    box-shadow: 0 0 0 0.24rem rgba(246, 230, 191, 0.95),
+                0 1.4rem 3.4rem rgba(52, 168, 98, 0.65);
+  }
+}
+
+/* الشريط السفلي المتحرك — يتحرك نحو اليسار في واجهة RTL */
+@keyframes marquee-rtl {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(50%, 0, 0); }
+}
+
+/* حركة Ken Burns بطيئة جداً على الخلفية */
+@keyframes ken-burns {
+  0%   { transform: scale(1) translate3d(0, 0, 0); }
+  50%  { transform: scale(1.07) translate3d(-1.2%, -0.8%, 0); }
+  100% { transform: scale(1) translate3d(0, 0, 0); }
+}
+
+/* تبديل الآيات */
+@keyframes ayah-in {
+  from { opacity: 0; transform: translate3d(0, 0.8rem, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes ayah-out {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to   { opacity: 0; transform: translate3d(0, -0.8rem, 0); }
+}
+
+/* تبدّل رقم الدقيقة في الساعة */
+@keyframes digit-roll {
+  from { opacity: 0; transform: translate3d(0, 0.45em, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* دخول طبقة الأذان */
+@keyframes overlay-in {
+  from { opacity: 0; backdrop-filter: blur(0); }
+  to   { opacity: 1; backdrop-filter: blur(1.2rem); }
+}
+
+/* دوائر ضوئية تتوسّع خلف اسم الصلاة في شاشة الأذان */
+/* الهالات مركزها منتصف الطبقة، فالازاحة جزء من الحركة نفسها */
+@keyframes halo {
+  0%   { opacity: 0.5; transform: translate3d(-50%, -50%, 0) scale(0.6); }
+  100% { opacity: 0;   transform: translate3d(-50%, -50%, 0) scale(1.75); }
+}
+
+/* نبضة العدّاد التنازلي كل ثانية */
+@keyframes tick-beat {
+  0%, 70%, 100% { transform: scale(1); }
+  35%           { transform: scale(1.06); }
+}
+
+/* وميض لطيف لشارة "حان الآن" */
+@keyframes badge-shine {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+/* احترام تفضيل تقليل الحركة (للاختبار على حاسوب المطوّر) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

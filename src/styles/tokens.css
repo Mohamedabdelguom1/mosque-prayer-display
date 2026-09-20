@@ -1,0 +1,56 @@
+/*
+ * المتغيّرات المركزية للتصميم.
+ * كل الأبعاد بوحدة rem، وجذر الخط يُقاس بـ vw في global.css
+ * حتى تتمدّد الواجهة بنسبة واحدة على 720p و1080p و4K.
+ */
+:root {
+  /* ===== الألوان ===== */
+  --c-night-900: #0b1a24;
+  --c-night-800: #0f2430;
+  --c-night-700: #16303f;
+  --c-panel: rgba(13, 35, 48, 0.74);
+  --c-panel-edge: rgba(180, 214, 232, 0.14);
+
+  --c-gold-100: #f6e6bf;
+  --c-gold-300: #e7c887;
+  --c-gold-500: #d4ac63;
+
+  --c-green-600: #1f7a45;
+  --c-green-500: #268c4f;
+  --c-green-400: #34a862;
+  --c-green-glow: rgba(52, 168, 98, 0.55);
+
+  --c-text: #f2f7fa;
+  --c-text-dim: rgba(226, 238, 246, 0.72);
+  --c-text-faint: rgba(216, 232, 242, 0.45);
+
+  /* ===== الخطوط ===== */
+  --f-sans: 'Cairo', 'Segoe UI', Tahoma, 'Noto Sans Arabic', sans-serif;
+  --f-quran: 'Amiri', 'Traditional Arabic', serif;
+
+  /* ===== المسافات ===== */
+  --gap-xs: 0.6rem;
+  --gap-sm: 1.1rem;
+  --gap-md: 1.8rem;
+  --gap-lg: 2.8rem;
+
+  /* المنطقة الآمنة من قصّ حواف التلفاز (overscan) */
+  --safe-x: 2.6%;
+  --safe-y: 3.2%;
+
+  /* ===== الأشكال ===== */
+  --r-card: 1.6rem;
+  --r-panel: 1.8rem;
+  /* شكل المحراب: قوس علوي دائري وقاعدة مستقيمة */
+  --r-mihrab: 46% 46% 1.4rem 1.4rem / 26% 26% 1.4rem 1.4rem;
+
+  --shadow-panel: 0 1.2rem 3rem rgba(0, 0, 0, 0.35);
+  --shadow-active: 0 0 0 0.22rem rgba(246, 230, 191, 0.85),
+    0 1rem 2.6rem var(--c-green-glow);
+
+  /* ===== مدد التحريك ===== */
+  --t-fast: 220ms;
+  --t-mid: 600ms;
+  --t-slow: 1200ms;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
