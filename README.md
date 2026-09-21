@@ -13,6 +13,7 @@
 ![Tests](https://img.shields.io/badge/%D8%A7%D9%84%D8%A7%D8%AE%D8%AA%D8%A8%D8%A7%D8%B1%D8%A7%D8%AA-118%20%D9%86%D8%A7%D8%AC%D8%AD%D8%A9-2ea043?style=flat-square)
 ![PWA](https://img.shields.io/badge/%D9%8A%D8%B9%D9%85%D9%84%20%D8%A8%D9%84%D8%A7%20%D8%A5%D9%86%D8%AA%D8%B1%D9%86%D8%AA-%D9%86%D8%B9%D9%85-8957e5?style=flat-square)
 ![RAM](https://img.shields.io/badge/%D8%A7%D9%84%D8%B0%D8%A7%D9%83%D8%B1%D8%A9-3.3%20MB-d4ac63?style=flat-square)
+![الترخيص](https://img.shields.io/badge/%D8%A7%D9%84%D8%AA%D8%B1%D8%AE%D9%8A%D8%B5-MIT-1f6feb?style=flat-square)
 
 </div>
 
